@@ -1,0 +1,93 @@
+import React,{Component} from 'react';
+import './Quiz.css';
+import ActiveQuiz from '../../Components/ActiveQuiz/ActiveQuiz';
+
+class Quiz extends Component {
+    state ={
+        activeQuestion : 0,
+        // хранить информацию о текущем клике пользователя 
+        answerState: null,
+        quize:[
+            {
+            rightAnswerId:2,
+            question:'Какого цвета небо?',
+            id:2,
+            answers:[
+                {text: 'Черный',id:1},
+                {text: 'Синий',id:2},
+                {text: 'Красный',id:3},
+                {text: 'Зеленый',id:4},
+            ]
+        
+    },
+    {
+        rightAnswerId:3,
+        question:'В каком году был основан Санкт-Петербург?',
+        id:2,
+        answers:[
+            {text: '1700',id:1},
+            {text: '1702',id:2},
+            {text: '1703',id:3},
+            {text: '1706',id:4},
+        ]
+    }]
+    }
+
+    onAnswerClickHandler = (answerId)=>{
+        
+
+        // получить доступ к вопросу 
+        const question = this.state.quize[this.state.activeQuestion]
+
+        if(question.rightAnswerId === answerId){
+            
+            this.setState({
+                answerState:{[answerId]:'success'}
+            })
+
+            const timeout = window.setTimeout(()=>{
+                if(this.isQuizFinished()){//если закончилось голосавние 
+                    console.log('Finished')
+                }else{
+                    this.setState({//переключение на следующий вопрос
+                        activeQuestion: this.state.activeQuestion + 1,
+                        answerState:null
+                    })
+                }
+                window.clearTimeout(timeout)
+            },1000)
+        }else{
+            this.setState({
+                answerState:{[answerId]:'error'}
+            })
+
+        }
+    }
+    
+    //закончилось голосование или нет
+    isQuizFinished(){
+        return this.state.activeQuestion+1 === this.state.quize.length
+    }
+
+    render(){
+        return(
+            <div className='Quiz'>
+                <div className='QuizWropper'>
+                    <h1>Ответьте на все вопросы</h1>
+                    < ActiveQuiz 
+                    answers ={this.state.quize[this.state.activeQuestion].answers}
+                    question ={this.state.quize[this.state.activeQuestion].question}
+                    onAnswerClick ={this.onAnswerClickHandler}
+                    quizeLength={this.state.quize.length}
+                    answerNumber={this.state.activeQuestion +1}
+                    state ={this.state.answerState}
+
+                    />
+                   
+                    
+                </div>
+            </div>
+        )
+    }
+}
+export default Quiz
