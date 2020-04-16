@@ -1,25 +1,42 @@
+//Результаты текста
 import React from 'react';
 import './FinishedQuiz.css';
+import Button from '../UI/Button/Button';
+
 
 const FinishedQuiz = props =>{
+    //счетчик правильных ответов
+    const succesCount = Object.keys(props.results).reduce((total, key) => {// Object.keys превращает обьект в массив ключей этого обьекта
+        if(props.results[key] === 'success'){
+            total++
+        }
+        return total
+    },0)//метод reduce 1 параметр функция, 2 значение с какого начинать считать
 
     return(
         <div className ='FinishedQuiz'>
-            <ul>
-                <li>
-                    <strong>1. </strong>
-                    How are you
-                    <i className='fa fa-times error'></i>
-                </li>
-                <li>
-                    <strong>2. </strong>
-                    How are you
-                    <i className='fa fa-check success'></i>
-                </li>
+            <ul> 
+                {props.quiz.map( //перебор списка вопросов и возвращение массива
+                    (quizItem,index)=>{ //quizItem обект данного quiz
+                        const cls = [  //создаем массив классов
+                            'fa',
+                            props.results[quizItem.id] ==='error'?'fa-times':'fa-check',// если в ответе error добавляем крестик или галочку
+                            props.results[quizItem.id] // берем правильно или неправильно из резултатов
+                        ]
+                        return( // для чего key
+                            <li key={index}> 
+                                <strong>{index+1}</strong>. &nbsp; 
+                                {quizItem.question}
+                                <i className={cls.join(' ')}/>
+                            </li>
+                        )
+                    }
+                )}
             </ul>
-            <p>Правиьно 4 из 10</p>
+            <p>Правиьно {succesCount} из {props.quiz.length}</p>
             <div>
-                <button>Пройти тест заново</button>
+                <Button onClick={props.onRetry} type='primary'> Повторить</Button>
+                <Button type='successButton'>Перейти в список тестов </Button>
             </div>
         </div>
     )
