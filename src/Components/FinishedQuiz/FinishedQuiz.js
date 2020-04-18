@@ -2,10 +2,12 @@
 import React from 'react';
 import './FinishedQuiz.css';
 import Button from '../UI/Button/Button';
+import {Link} from 'react-router-dom';
 
 
 const FinishedQuiz = props =>{
     //счетчик правильных ответов
+    
     const succesCount = Object.keys(props.results).reduce((total, key) => {// Object.keys превращает обьект в массив ключей этого обьекта
         if(props.results[key] === 'success'){
             total++
@@ -36,7 +38,9 @@ const FinishedQuiz = props =>{
             <p>Правиьно {succesCount} из {props.quiz.length}</p>
             <div>
                 <Button onClick={props.onRetry} type='primary'> Повторить</Button>
-                <Button type='successButton'>Перейти в список тестов </Button>
+                <Link to='/'>
+                    <Button type='successButton'>Перейти в список тестов </Button>
+                </Link>
             </div>
         </div>
     )
