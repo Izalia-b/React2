@@ -1,11 +1,13 @@
 import React, {Component} from 'react'
-import classes from './Auth.css'
-import Button from '../../components/UI/Button/Button'
-import Input from '../../components/UI/Input/Input'
+import './Auth.css'
+import Button from '../../Components/UI/Button/Button'
+import Input from '../../Components/UI/Input/Input'
+import is from 'is_js'
 
 export default class Auth extends Component {
 
   state = {
+    isFormValid:false,
     formControls: {
       email: {
         value: '',
@@ -49,9 +51,57 @@ export default class Auth extends Component {
     event.preventDefault()
   }
 
-  onChangeHandler = (event, controlName) => {
-    console.log(`${controlName}: `, event.target.value)
+//
+  validateControl(value, validation) {
+      //если не параметра, не проверять значит
+    if (!validation) {
+      return true
+    }
+
+    let isValid = true
+
+//если 
+    if (validation.required) {
+        //trim() очищает пробелы и если не пустой строке и && если до этого была уже false
+      isValid = value.trim() !== '' && isValid
+    }
+//если 
+    if (validation.email) {
+      isValid = is.email(value) && isValid
+    }
+//если 
+    if (validation.minLength) {
+      isValid = value.length >= validation.minLength && isValid
+    }
+
+    return isValid
   }
+
+
+
+  onChangeHandler = (event, controlName) => {
+      // чтобы не мутировался state?? копию  state и control
+    const formControls = { ...this.state.formControls }
+    const control = { ...formControls[controlName] }
+    //переопределяем значения
+    control.value = event.target.value
+    control.touched = true
+    //передаем новое значение и validation из стейта
+    control.valid = this.validateControl(control.value, control.validation)
+    //обновляем formControls
+    formControls[controlName] = control
+//если что то пишем в инпут 
+    let isFormValid = true
+//пройтись по всем обьектам , получим либо имейл либо пароль
+    Object.keys(formControls).forEach(name => { 
+      isFormValid = formControls[name].valid && isFormValid//у имейл либо пароль проверяем валидно ли оно
+    })
+    //изменить состояние обьекта
+    this.setState({
+      formControls, isFormValid
+    })
+  }
+
 
   renderInputs() {//получить массив из email и password инпутов
     return Object.keys(this.state.formControls).map((controlName, index) => {
@@ -77,17 +127,18 @@ export default class Auth extends Component {
 
   render() {
     return (
-      <div className={classes.Auth}>
+      <div className='Auth'>
         <div>
           <h1>Авторизация</h1>
 
-          <form onSubmit={this.submitHandler} className={classes.AuthForm}>
+          <form onSubmit={this.submitHandler} className='AuthForm'>
 
             { this.renderInputs() }
 
             <Button
-              type="success"
+              type="successButton"
               onClick={this.loginHandler}
+              disabled={!this.state.isFormValid}
             >
               Войти
             </Button>
@@ -95,6 +146,7 @@ export default class Auth extends Component {
             <Button
               type="primary"
               onClick={this.registerHandler}
+              disabled={!this.state.isFormValid}
             >
               Зарегистрироваться
             </Button>
