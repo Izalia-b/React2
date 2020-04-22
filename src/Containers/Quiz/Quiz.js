@@ -3,6 +3,9 @@ import React,{Component} from 'react';
 import './Quiz.css';
 import ActiveQuiz from '../../Components/ActiveQuiz/ActiveQuiz';
 import FinishedQuiz from '../../Components/FinishedQuiz/FinishedQuiz';
+import axios from '../../axios-quiz/axios-quiz';
+import Loaders from '../../Components/UI/Loaders/Loaders';
+
 
 class Quiz extends Component {
     state ={
@@ -15,31 +18,8 @@ class Quiz extends Component {
         // хранить информацию о текущем клике пользователя , правильный или неправильный ответ
         answerState: null,
         //список вопросов с вариантами ответа
-        quize:[
-            {
-            rightAnswerId:2,
-            question:'Какого цвета небо?',
-            //номер вопроса
-            id:1,
-            answers:[
-                {text: 'Черный',id:1},//номер ответа
-                {text: 'Синий',id:2},
-                {text: 'Красный',id:3},
-                {text: 'Зеленый',id:4},
-            ]
-        
-    },
-    {
-        rightAnswerId:3,
-        question:'В каком году был основан Санкт-Петербург?',
-        id:2,
-        answers:[
-            {text: '1700',id:1},
-            {text: '1702',id:2},
-            {text: '1703',id:3},
-            {text: '1706',id:4},
-        ]
-    }]
+        quize:[],
+        loading:true,
     }
 
 
@@ -115,43 +95,57 @@ class Quiz extends Component {
         answerState: null,
         })
     }
-    componentDidMount(){
-        console.log("Quiz id="+this.props.match.params.id)
-    }
+    
+    async componentDidMount() {
+        try {
+          const response = await axios.get(`/quizes/${this.props.match.params.id}.json`)
+          const quiz = response.data
+    
+          this.setState({
+            quize:quiz,
+            loading: false
+          })
+        } catch (e) {
+          console.log(e)
+        }
+      }
+
+
     render(){
         return(
             <div className='Quiz'>
                 <div className='QuizWropper'>
                     <h1>Ответьте на все вопросы</h1>
-                    {this.state.isFinished
-
-
-                    //Отрисовка тест пройден
-                    ? <FinishedQuiz
-                    // результаты всех вопросов
-                    results={this.state.results}
-                    //сам вопрос
-                    quiz={this.state.quize}
-                    //функция пройти тест заново
-                    onRetry={this.retryHandler}
-                    />
-
-
-                    //Отрисовка текущего вопроса и ответов
-                    : < ActiveQuiz 
-                    //передать ответы 
-                    answers ={this.state.quize[this.state.activeQuestion].answers}
-                    //передать вопрос
-                    question ={this.state.quize[this.state.activeQuestion].question}
-                    //функция по нажатию на ответ
-                    onAnswerClick ={this.onAnswerClickHandler}
-                    //длинна списков вопросов
-                    quizeLength={this.state.quize.length}
-                    //номер текущего вопроса +1 чтобы вывести именно число а не индекс
-                    answerNumber={this.state.activeQuestion +1}
-                    //правильно ли на текущий вопрос ответил
-                    state ={this.state.answerState}
-                    />
+                    {
+                        this.state.loading
+                        ?<Loaders/>
+                        : this.state.isFinished
+                            //Отрисовка тест пройден
+                            ? <FinishedQuiz
+                            // результаты всех вопросов
+                            results={this.state.results}
+                            //сам вопрос
+                            quiz={this.state.quize}
+                            //функция пройти тест заново
+                            onRetry={this.retryHandler}
+                            />
+        
+        
+                            //Отрисовка текущего вопроса и ответов
+                            : < ActiveQuiz 
+                            //передать ответы 
+                            answers ={this.state.quize[this.state.activeQuestion].answers}
+                            //передать вопрос
+                            question ={this.state.quize[this.state.activeQuestion].question}
+                            //функция по нажатию на ответ
+                            onAnswerClick ={this.onAnswerClickHandler}
+                            //длинна списков вопросов
+                            quizeLength={this.state.quize.length}
+                            //номер текущего вопроса +1 чтобы вывести именно число а не индекс
+                            answerNumber={this.state.activeQuestion +1}
+                            //правильно ли на текущий вопрос ответил
+                            state ={this.state.answerState}
+                            />
                     }
                 </div>
             </div>
