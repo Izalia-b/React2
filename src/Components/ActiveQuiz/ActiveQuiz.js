@@ -4,6 +4,7 @@ import './ActiveQuiz.css';
 import AnswersList from './AnswersList/AnswersList';
 
  const ActiveQuiz =(props)=>{
+   console.log(props)
     return (
      <div className='ActiveQuiz'>
         {/* вопрос */}
@@ -13,7 +14,8 @@ import AnswersList from './AnswersList/AnswersList';
                 {props.question}
              </span>
              {/* какой из скольки */}
-             <small>{props.answerNumber} из {props.quizeLength}</small>
+             <small>{props.answerNumber} из {props.quizLength}</small>
+             
          </p>
          {/* варианты ответа */}
         <AnswersList 
